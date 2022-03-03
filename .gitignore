@@ -1,0 +1,31 @@
+# Yarn V2
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+yarn-error.log
+
+# MacOS
+.DS_Store
+
+node_modules
+
+# ESLint
+.eslintcache
+
+# Intellij
+.idea
+
+coverage
+packages/*/src/**/*.js
+packages/*/src/**/*.d.ts
+packages/*/test/**/*.js
+packages/*/test/**/*.d.ts
+
+# Typescript
+tsconfig.build.tsbuildinfo
+tsconfig.tsbuildinfo
