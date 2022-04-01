@@ -1,0 +1,126 @@
+import { ulid } from 'ulid';
+import { resolve } from 'path';
+import TerserPlugin from 'terser-webpack-plugin';
+import { DefinePlugin, NormalModuleReplacementPlugin } from 'webpack';
+
+import { createConfiguration } from '../../src/configure';
+import { loadPatch } from '../../src/patches';
+
+import { getLambdaFile, Lambdas } from '../fixtures';
+
+const CALLER_NODE_MODULES = 'node_modules';
+const LAMBDA_TOOLS_NODE_MODULES = resolve(__dirname, '..', '..', 'node_modules');
+
+jest.mock('../../src/patches');
+jest.mock('webpack', () => ({
+  DefinePlugin: jest.fn(),
+  NormalModuleReplacementPlugin: jest.fn(),
+  config: jest.requireActual('webpack').config,
+}));
+
+jest.mock('terser-webpack-plugin');
+
+const defaultEntryPoint = {
+  [`${Lambdas.lambdaService}.js`]: [getLambdaFile({ lambda: Lambdas.lambdaService })],
+};
+
+const pnpVersion = process.versions.pnp;
+beforeEach(() => {
+  process.versions.pnp = pnpVersion;
+});
+
+afterEach(() => {
+  delete process.env.WEBPACK_MODE;
+  process.versions.pnp = pnpVersion;
+});
+
+test('will set up for non pnp', async () => {
+  delete process.versions.pnp;
+  const configuration = await createConfiguration({ entrypoint: getLambdaFile({ lambda: Lambdas.lambdaService }) });
+  expect(configuration.webpackConfig).toEqual(expect.objectContaining({
+    resolve: {
+      extensions: ['.js', '.ts', '.mjs', '.cjs'],
+      modules: [CALLER_NODE_MODULES, LAMBDA_TOOLS_NODE_MODULES],
+    },
+    resolveLoader: {
+      modules: [LAMBDA_TOOLS_NODE_MODULES, CALLER_NODE_MODULES],
+    },
+  }));
+});
+
+test('will set defaults', async () => {
+  const configuration = await createConfiguration({ entrypoint: getLambdaFile({ lambda: Lambdas.lambdaService }) });
+  expect(configuration.webpackConfig).toEqual(expect.objectContaining({
+    entry: defaultEntryPoint,
+    output: {
+      path: process.cwd(),
+      libraryTarget: 'commonjs',
+      filename: '[name]',
+    },
+    resolve: {
+      extensions: ['.js', '.ts', '.mjs', '.cjs'],
+    },
+    resolveLoader: {},
+    devtool: undefined,
+    optimization: { minimize: false },
+    mode: 'production',
+  }));
+  expect(configuration).toHaveProperty('outputDir', process.cwd());
+  expect(configuration).toHaveProperty('entries', defaultEntryPoint);
+  expect(NormalModuleReplacementPlugin).toBeCalledWith(/^any-promise$/, 'core-js/fn/promise');
+  expect(DefinePlugin).toBeCalledWith({
+    'global.GENTLY': false,
+    'process.env.LIFEOMIC_SERVICE_NAME': '\'test-service\'',
+  });
+  expect(loadPatch).toBeCalledWith('lambda');
+  expect(loadPatch).not.toBeCalledWith('dns');
+});
+
+test('can override defaults', async () => {
+  process.env.WEBPACK_MODE = 'development';
+  const serviceName = ulid();
+  const outputPath = '/some/output/path';
+  const configTransformer = jest.fn().mockImplementation(async (config: Record<string, any>) => Promise.resolve({
+    ...config,
+    watch: true,
+  }));
+  const configuration = await createConfiguration({
+    entrypoint: getLambdaFile({ lambda: Lambdas.tsLambdaService, ext: 'ts' }),
+    serviceName,
+    configTransformer,
+    enableRuntimeSourceMaps: true,
+    enableDnsRetry: true,
+    outputPath,
+    minify: true,
+  });
+  const entries = {
+    [`${Lambdas.tsLambdaService}.js`]: ['source-map-support/register', getLambdaFile({ lambda: Lambdas.tsLambdaService, ext: 'ts' })],
+  };
+
+  expect(configuration.webpackConfig).toEqual(expect.objectContaining({
+    entry: entries,
+    output: {
+      path: outputPath,
+      libraryTarget: 'commonjs',
+      filename: '[name]',
+    },
+    resolve: {
+      extensions: ['.js', '.ts', '.mjs', '.cjs'],
+    },
+    resolveLoader: {},
+    devtool: 'source-map',
+    optimization: expect.objectContaining({ minimize: true }),
+    mode: 'development',
+    watch: true,
+  }));
+  expect(configuration).toHaveProperty('outputDir', outputPath);
+  expect(configuration).toHaveProperty('entries', entries);
+  expect(NormalModuleReplacementPlugin).toBeCalledWith(/^any-promise$/, 'core-js/fn/promise');
+  expect(TerserPlugin).toBeCalledWith({ terserOptions: { sourceMap: true } });
+  expect(DefinePlugin).toBeCalledWith({
+    'global.GENTLY': false,
+    'process.env.LIFEOMIC_SERVICE_NAME': `'${serviceName}'`,
+  });
+  expect(loadPatch).toBeCalledWith('lambda');
+  expect(loadPatch).toBeCalledWith('dns');
+});

@@ -4,6 +4,7 @@
     "noEmit": false
   },
   "include": [
-    "packages/**/src/**/*.ts"
+    "packages/**/src/**/*.ts",
+    "packages/**/bin/**/*.ts",
   ]
 }

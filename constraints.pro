@@ -1,5 +1,5 @@
 % Enforces the engines.node field for all workspaces
-gen_enforced_field(WorkspaceCwd, 'engines.node', '>=12.12.6').
+gen_enforced_field(WorkspaceCwd, 'engines.node', '>=14.14.0').
 
 % Enforces the version for all projects as 0.0.0
 gen_enforced_field(WorkspaceCwd, 'version', '0.0.0').
@@ -22,7 +22,7 @@ gen_enforced_field(WorkspaceCwd, 'license', null) :-
 
 % Enforces the repository field for all public workspaces while removing it from private workspaces
 gen_enforced_field(WorkspaceCwd, 'repository.type', 'git').
-gen_enforced_field(WorkspaceCwd, 'repository.url', 'https://github.com/lifeomic/test-tools.git').
+gen_enforced_field(WorkspaceCwd, 'repository.url', 'https://github.com/lifeomic/compile-tools.git').
 gen_enforced_field(WorkspaceCwd, 'repository.directory', WorkspaceCwd).
 
 % Enforces the author field to be consistent
