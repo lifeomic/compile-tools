@@ -6,18 +6,9 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import JsZip from 'jszip';
 import { getLambdaFile, Lambdas, tmpProjectDir } from '../../fixtures';
+import { fileExists } from '../../unit/helpers';
 
 let testBuildDir: string;
-
-const fileExists = async (file: string) => {
-  try {
-    const stat = await fs.stat(file);
-    return stat.isFile();
-  } catch (e) {
-    console.log(`Unable to find ${file}`);
-    return false;
-  }
-};
 
 beforeEach( async() => {
   testBuildDir = join(tmpProjectDir, 'build', ulid());
@@ -25,7 +16,7 @@ beforeEach( async() => {
 });
 
 afterEach(async () => {
-  await fs.rmdir(testBuildDir, { recursive: true });
+  await fs.rm(testBuildDir, { recursive: true, force: true });
 });
 
 test('Lambda archives can be produced', async () => {
@@ -128,7 +119,7 @@ test('bundles with custom names can be zipped', async () => {
   await expect(fileExists(join(testBuildDir, 'lambda', 'tsService.js.zip'))).resolves.toBe(true);
 });
 
-test.only('Expand input entrypoint directory into multiple entrypoints', async () => {
+test('Expand input entrypoint directory into multiple entrypoints', async () => {
   const result = spawnSync('npx', [
     'lifeomic-webpack',
     '-o', testBuildDir,

@@ -3,22 +3,22 @@ import { mock } from 'jest-mock-extended';
 import { ulid } from 'ulid';
 import { join, basename, relative } from 'path';
 import { promises as fs } from 'fs';
-import { spawnSync } from 'child_process';
 import JSZip from 'jszip';
 
 import { handleWebpackResults, logger, makeFilePathRelativeToCwd, zipOutputFiles } from '../../src/utils';
 import { projectsDir } from '../fixtures';
-import { handleSpawnResults } from '../integration/test/utils';
+import { copyRecursive } from './helpers';
 
-let buildDir: string;
+let testBuildDir: string;
 
-beforeEach(() => {
+beforeEach(async () => {
   jest.spyOn(logger, 'info').mockReturnValue();
-  buildDir = join(__dirname, 'build', ulid());
+  testBuildDir = join(__dirname, 'build', ulid());
+  await fs.mkdir(testBuildDir, { recursive: true });
 });
 
 afterEach(async () => {
-  await fs.rmdir(buildDir, { recursive: true });
+  // await fs.rm(testBuildDir, { recursive: true, force: true });
 });
 
 describe('handleWebpackResults', () => {
@@ -44,7 +44,7 @@ describe('handleWebpackResults', () => {
 
     expect(logger.info).toBeCalledWith('Webpack compilation result:\n', 'webpack results');
     expect(stats.toString).toBeCalledWith({
-      colors: true,
+      colors: expect.any(Boolean),
       chunks: false,
       maxModules: 0,
       moduleTrace: false,
@@ -63,12 +63,12 @@ test('will return the relative portion of the path', () => {
 });
 
 test('zipOutputFiles will zip files for us', async () => {
-  handleSpawnResults(spawnSync('cp', ['-r', join(projectsDir, 'zip'), `${buildDir}`]));
+  await copyRecursive(join(projectsDir, 'zip'), testBuildDir);
   const entries = ['first.js', 'second.js', 'third/third.js'];
-  await expect(zipOutputFiles(buildDir, entries)).resolves.not.toThrow();
+  await expect(zipOutputFiles(testBuildDir, entries)).resolves.not.toThrow();
   await Promise.all(entries.map(async (name) => {
     const zip = new JSZip();
-    const zipFileName = join(buildDir, `${name}.zip`);
+    const zipFileName = join(testBuildDir, `${name}.zip`);
     await expect(fs.stat(zipFileName)).resolves.not.toThrow();
     await zip.loadAsync(await fs.readFile(zipFileName));
     expect(zip.file(basename(name))).not.toBeNull();

@@ -36,3 +36,6 @@ tsconfig.build.tsbuildinfo
 tsconfig.tsbuildinfo
 
 build/
+
+package.tgz
+
