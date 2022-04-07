@@ -1,13 +1,15 @@
 {
   "extends": "@lifeomic/typescript-config",
   "compilerOptions": {
-    "resolveJsonModule": true,
-    "module": "commonjs",
-    "types": ["node", "jest"],
-    "target": "es2019",
-    "lib": ["es2020", "esnext.asynciterable", "dom"],
-    "noEmit": true,
+    "composite": true,
+    "declaration": true,
     "declarationMap": true,
-    "composite": true
+    "lib": ["es2021", "dom"],
+    "module": "commonjs",
+    "noEmit": true,
+    "target": "es2020",
+    "types": ["node", "jest"],
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   }
 }
