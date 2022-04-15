@@ -4,9 +4,6 @@ const config: Config.InitialOptions = {
   ...rootConfig,
   projects: [
     {
-      coveragePathIgnorePatterns: [
-        '<rootDir>/src/patches/footer.*',
-      ],
       ...getProjectConfig(__dirname),
     },
   ],

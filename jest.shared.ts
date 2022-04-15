@@ -10,6 +10,23 @@ export const packages = readdirSync(basePath).filter((name) => lstatSync(path.jo
 // If we are debugging then extend the timeout to max value, otherwise use the default.
 const testTimeout = inspector.url() ? 1e8 : undefined;
 
+const colors = [
+  'green',
+  'yellow',
+  'blue',
+  'magenta',
+  'cyan',
+  'greenBright',
+  'yellowBright',
+  'blueBright',
+  'magentaBright',
+  'cyanBright',
+] as const;
+
+const transform: Config.InitialProjectOptions['transform'] = {
+  '^.+\\.tsx?$': '@swc/jest',
+};
+
 export const rootConfig: Config.InitialOptions = {
   preset: '@lifeomic/jest-config',
   testEnvironment: 'node',
@@ -32,24 +49,22 @@ export const rootConfig: Config.InitialOptions = {
   clearMocks: true,
   restoreMocks: true,
   resetMocks: true,
+  transform,
   verbose: true,
   testTimeout,
 };
 
-const projectConfigsMap = packages.reduce<Record<string, Config.InitialProjectOptions>>((acc, packageName) => ({
+const projectConfigsMap = packages.reduce<Record<string, Config.InitialProjectOptions>>((acc, packageName, idx) => ({
   ...acc,
   [packageName]: {
     rootDir: path.join(basePath, packageName),
-    displayName: { name: packageName, color: 'cyan' },
+    displayName: { name: packageName, color: colors[idx % colors.length] },
     testMatch: ['<rootDir>/test/unit/**/*.test.ts'],
-    transform: {
-      '^.+\\.ts$': '@swc/jest',
-    },
+    transform,
     // Started getting strange errors where the mocks weren't reset.  Moving these configs here fixed the issue...
     clearMocks: true,
     restoreMocks: true,
     resetMocks: true,
-    verbose: true,
   },
 }), {} as Record<string, Config.InitialProjectOptions>);
 
@@ -66,20 +81,17 @@ export const rootIntegrationConfig: Config.InitialOptions = {
   testTimeout,
 };
 
-const projectIntegrationConfigsMap = packages.reduce<Record<string, Config.InitialProjectOptions>>((acc, packageName) => ({
+const projectIntegrationConfigsMap = packages.reduce<Record<string, Config.InitialProjectOptions>>((acc, packageName, idx) => ({
   ...acc,
   [packageName]: {
     rootDir: path.join(basePath, packageName),
-    displayName: { name: packageName, color: 'cyan' },
+    displayName: { name: packageName, color: colors[idx % colors.length] },
     testMatch: ['<rootDir>/test/integration/**/*.test.ts'],
-    transform: {
-      '^.+\\.ts$': '@swc/jest',
-    },
+    transform,
     // Started getting strange errors where the mocks weren't reset.  Moving these configs here fixed the issue...
     clearMocks: true,
     restoreMocks: true,
     resetMocks: true,
-    verbose: true,
   },
 }), {} as Record<string, Config.InitialProjectOptions>);
 

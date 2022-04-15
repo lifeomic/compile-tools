@@ -13,7 +13,7 @@ import { logging } from '@lifeomic/test-tool-utils';
 
 const glob = promisify(rawGlob);
 
-export const logger = logging.getLogger('webpack');
+export const logger = logging.getLogger('lifeomic-webpack');
 
 export interface Entry {
   file: string;
