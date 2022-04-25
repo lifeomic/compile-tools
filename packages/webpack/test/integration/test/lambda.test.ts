@@ -1,8 +1,8 @@
 import { join } from 'path';
 
-import { Lambdas, tmpProjectDir } from '../../fixtures';
+import { Project1Lambdas } from '../../testProject1';
 import { localStackHooks } from '@lifeomic/test-tool-localstack';
-import { BUILD_ENV, handleSpawnResults } from './utils';
+import { BUILD_ENV, handleSpawnResults, tmpProjectDir, tmpTestProject1Dir } from './utils';
 import { Lambda } from '@aws-sdk/client-lambda';
 import { ulid } from 'ulid';
 import { promises as fs } from 'fs';
@@ -19,9 +19,9 @@ const supportedNodeVersions = [
 type NodeVersion = typeof supportedNodeVersions[number];
 
 const lambdas = [
-  Lambdas.asyncTest,
-  Lambdas.asyncWithArrow,
-  Lambdas.asyncIterators,
+  Project1Lambdas.asyncTest,
+  Project1Lambdas.asyncWithArrow,
+  Project1Lambdas.asyncIterators,
   'es_modules',
 ] as const;
 
@@ -76,7 +76,7 @@ beforeAll(async () => {
     'lambdas',
     'es_modules',
   ], {
-    cwd: tmpProjectDir,
+    cwd: tmpTestProject1Dir,
     env: BUILD_ENV,
   });
   handleSpawnResults(result);
@@ -105,10 +105,10 @@ describe.each(supportedNodeVersions)('Node %s', (nodeVersion) => {
   };
 
   test(`Can webpack files that use arrow functions inside async functions when targeting ${nodeVersion}`, async () => {
-    await runLambda(Lambdas.asyncWithArrow, '{}');
+    await runLambda(Project1Lambdas.asyncWithArrow, '{}');
   });
 
   test(`Can webpack files that use async iterators inside when targeting ${nodeVersion}`, async () => {
-    await runLambda(Lambdas.asyncIterators, 5 + 4 + 3 + 2 + 1);
+    await runLambda(Project1Lambdas.asyncIterators, 5 + 4 + 3 + 2 + 1);
   });
 });

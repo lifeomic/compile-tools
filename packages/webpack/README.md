@@ -17,6 +17,21 @@ documentation may be accessed using the `lifeomic-webpack --help` command.
 Currently tested and working with `npm` and `yarn v1`.  TODO: Add support for 
 `yarn berry`.
 
+`lifeomic-webpack -h` for CLI options.
+
+Will also accept configuration options from `package.json#lifeomic-webpack` field, 
+or from the following config files. 
+
+    .lifeomic-webpackrc.json
+    .lifeomic-webpackrc.yaml
+    .lifeomic-webpackrc.yml
+    .lifeomic-webpackrc.js
+    .lifeomic-webpackrc.ts
+    .lifeomic-webpackrc.cjs
+    lifeomic-webpack.config.js
+    lifeomic-webpack.config.ts
+    lifeomic-webpack.config.cjs
+
 **Build all lambda functions within a directory:**
 
 ```bash

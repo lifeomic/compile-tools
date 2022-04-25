@@ -6,7 +6,8 @@ import { DefinePlugin, NormalModuleReplacementPlugin } from 'webpack';
 import { createConfiguration } from '../../src/configure';
 import { loadPatch } from '../../src/patches';
 
-import { getLambdaFile, Lambdas } from '../fixtures';
+import { Project1Lambdas } from '../testProject1';
+import { getLambdaFile } from '../shared/projects';
 
 const CALLER_NODE_MODULES = 'node_modules';
 const LAMBDA_TOOLS_NODE_MODULES = resolve(__dirname, '..', '..', 'node_modules');
@@ -21,7 +22,7 @@ jest.mock('webpack', () => ({
 jest.mock('terser-webpack-plugin');
 
 const defaultEntryPoint = {
-  [`${Lambdas.lambdaService}.js`]: [getLambdaFile({ lambda: Lambdas.lambdaService })],
+  [`${Project1Lambdas.lambdaService}.js`]: [getLambdaFile({ lambda: Project1Lambdas.lambdaService })],
 };
 
 const pnpVersion = process.versions.pnp;
@@ -36,7 +37,7 @@ afterEach(() => {
 
 test('will set up for non pnp', async () => {
   delete process.versions.pnp;
-  const configuration = await createConfiguration({ entrypoint: getLambdaFile({ lambda: Lambdas.lambdaService }) });
+  const configuration = await createConfiguration({ entrypoint: getLambdaFile({ lambda: Project1Lambdas.lambdaService }) });
   expect(configuration.webpackConfig).toEqual(expect.objectContaining({
     resolve: {
       extensions: ['.js', '.ts', '.mjs', '.cjs'],
@@ -49,7 +50,7 @@ test('will set up for non pnp', async () => {
 });
 
 test('will set defaults', async () => {
-  const configuration = await createConfiguration({ entrypoint: getLambdaFile({ lambda: Lambdas.lambdaService }) });
+  const configuration = await createConfiguration({ entrypoint: getLambdaFile({ lambda: Project1Lambdas.lambdaService }) });
   expect(configuration.webpackConfig).toEqual(expect.objectContaining({
     entry: defaultEntryPoint,
     output: {
@@ -85,7 +86,7 @@ test('can override defaults', async () => {
     watch: true,
   }));
   const configuration = await createConfiguration({
-    entrypoint: getLambdaFile({ lambda: Lambdas.tsLambdaService, ext: 'ts' }),
+    entrypoint: getLambdaFile({ lambda: Project1Lambdas.tsLambdaService, ext: 'ts' }),
     serviceName,
     configTransformer,
     enableRuntimeSourceMaps: true,
@@ -94,7 +95,7 @@ test('can override defaults', async () => {
     minify: true,
   });
   const entries = {
-    [`${Lambdas.tsLambdaService}.js`]: ['source-map-support/register', getLambdaFile({ lambda: Lambdas.tsLambdaService, ext: 'ts' })],
+    [`${Project1Lambdas.tsLambdaService}.js`]: ['source-map-support/register', getLambdaFile({ lambda: Project1Lambdas.tsLambdaService, ext: 'ts' })],
   };
 
   expect(configuration.webpackConfig).toEqual(expect.objectContaining({

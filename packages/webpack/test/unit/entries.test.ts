@@ -2,15 +2,16 @@ import { promises as fs } from 'fs';
 import { join, resolve, basename } from 'path';
 
 import { getEntries, parseEntrypoint } from '../../src/entries';
-import { projectsDir, Lambdas, getLambdaFile } from '../fixtures';
+import { testProject1Dir, Project1Lambdas } from '../testProject1';
+import { getLambdaFile } from '../shared/projects';
 
-const serviceProjectLambdasDir = join(projectsDir, 'lambdas');
+const serviceProjectLambdasDir = join(testProject1Dir, 'lambdas');
 const filesPromise = fs.readdir(serviceProjectLambdasDir);
 
 test.each<[string, string | undefined]>([
-  [getLambdaFile({ lambda: Lambdas.lambdaService }), undefined],
-  [getLambdaFile({ lambda: Lambdas.lambdaService, ext: 'ts' }), undefined],
-  [getLambdaFile({ lambda: Lambdas.lambdaService }), 'test-service'],
+  [getLambdaFile({ lambda: Project1Lambdas.lambdaService }), undefined],
+  [getLambdaFile({ lambda: Project1Lambdas.lambdaService, ext: 'ts' }), undefined],
+  [getLambdaFile({ lambda: Project1Lambdas.lambdaService }), 'test-service'],
 ])('%# parseEntrypoint will return file path and name', (fileName, name) => {
   const entrypoint = `${fileName}${name ? `:${name}` : ''}`;
   const expectedName = name ?? basename(fileName).replace(/\.ts$/, '.js');
@@ -22,28 +23,28 @@ test.each<[string, string | undefined]>([
 
 describe('getEntries', () => {
   test('can return a single file entrypoint', async () => {
-    const fileName = `${Lambdas.lambdaService}.js`;
-    const entryPoints = await getEntries(getLambdaFile({ lambda: Lambdas.lambdaService }));
+    const fileName = `${Project1Lambdas.lambdaService}.js`;
+    const entryPoints = await getEntries(getLambdaFile({ lambda: Project1Lambdas.lambdaService }));
     expect(entryPoints).toEqual({
-      [fileName]: [join(projectsDir, 'lambdas', fileName)],
+      [fileName]: [join(testProject1Dir, 'lambdas', fileName)],
     });
   });
   test('will accept an array of files', async () => {
     const entryPoints = await getEntries([
-      getLambdaFile({ lambda: Lambdas.lambdaService }),
-      getLambdaFile({ lambda: Lambdas.tsLambdaService, ext: 'ts' }),
+      getLambdaFile({ lambda: Project1Lambdas.lambdaService }),
+      getLambdaFile({ lambda: Project1Lambdas.tsLambdaService, ext: 'ts' }),
     ]);
     expect(entryPoints).toEqual({
-      [`${Lambdas.lambdaService}.js`]: [getLambdaFile({ lambda: Lambdas.lambdaService })],
-      [`${Lambdas.tsLambdaService}.js`]: [getLambdaFile({ lambda: Lambdas.tsLambdaService, ext: 'ts' })],
+      [`${Project1Lambdas.lambdaService}.js`]: [getLambdaFile({ lambda: Project1Lambdas.lambdaService })],
+      [`${Project1Lambdas.tsLambdaService}.js`]: [getLambdaFile({ lambda: Project1Lambdas.tsLambdaService, ext: 'ts' })],
     });
   });
 
   test('will prepend source-map-support/register', async () => {
-    const fileName = `${Lambdas.lambdaService}.js`;
-    const entryPoints = await getEntries(getLambdaFile({ lambda: Lambdas.lambdaService }), true);
+    const fileName = `${Project1Lambdas.lambdaService}.js`;
+    const entryPoints = await getEntries(getLambdaFile({ lambda: Project1Lambdas.lambdaService }), true);
     expect(entryPoints).toEqual({
-      [fileName]: ['source-map-support/register', join(projectsDir, 'lambdas', fileName)],
+      [fileName]: ['source-map-support/register', join(testProject1Dir, 'lambdas', fileName)],
     });
   });
 
@@ -57,7 +58,7 @@ describe('getEntries', () => {
   });
 
   test('will return nested index files also', async () => {
-    const dir = join(projectsDir, 'multi-lambdas');
+    const dir = join(testProject1Dir, 'multi-lambdas');
     await expect(getEntries(dir)).resolves.toEqual({
       'func1.js': [join(dir, 'func1.js')],
       'func2.js': [join(dir, 'func2.ts')],

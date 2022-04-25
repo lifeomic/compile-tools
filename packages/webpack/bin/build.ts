@@ -5,6 +5,44 @@ import chalk from 'chalk';
 import yargs from 'yargs';
 
 import { compile, Config } from '../src';
+import { logger } from '../src/utils';
+
+import { cosmiconfig } from 'cosmiconfig';
+import TypeScriptLoader from 'cosmiconfig-typescript-loader';
+
+const name = 'lifeomic-webpack';
+
+export const loadConfig = async (): Promise<Partial<Config>> => {
+  try {
+    const explorer = cosmiconfig(name, {
+      searchPlaces: [
+        'package.json',
+        `.${name}rc.json`,
+        `.${name}rc.yaml`,
+        `.${name}rc.yml`,
+        `.${name}rc.js`,
+        `.${name}rc.ts`,
+        `.${name}rc.cjs`,
+        `${name}.config.js`,
+        `${name}.config.ts`,
+        `${name}.config.cjs`,
+      ],
+      loaders: {
+        '.ts': TypeScriptLoader(),
+      },
+      ignoreEmptySearchPlaces: true,
+    });
+    const results = await explorer.search();
+    if (results) {
+      const { filepath, config } = results;
+      logger.debug(`Loaded config from ${filepath}`);
+      return config;
+    }
+  } catch (e) {
+    console.error(e);
+  }
+  return {};
+};
 
 const epilogue = `
 Each entrypoint is a single source file that represents the top-level module for
@@ -71,7 +109,6 @@ const argv = yargs(process.argv.slice(2))
     describe: 'enables babel-loader cache directory',
     type: 'boolean',
   })
-  .demandCommand(1)
   .epilog(epilogue)
   .parseSync();
 
@@ -89,20 +126,6 @@ const buildOptions: Config = {
   cacheDirectory: argv.enableCacheDirectory,
 };
 
-if (argv.t) {
-  // assert typescript and ts-loader are installed
-  ['typescript', 'ts-loader'].forEach((dependency) => {
-    try {
-      require.resolve(dependency);
-    } catch (_) {
-      console.error(chalk.bold.red(`It looks like you're trying to use TypeScript but do not have '${chalk.bold(
-        dependency,
-      )}' installed. Please install it or remove the tsconfig flag.`));
-      process.exit(1);
-    }
-  });
-}
-
 const prep = async () => {
   if (argv.w) {
     // Ignore the non-literal module require because the module to load is
@@ -115,6 +138,34 @@ const prep = async () => {
     }
     buildOptions.configTransformer = transformFunction;
   }
+  const configFile = await loadConfig();
+  Object.assign(buildOptions, configFile);
+
+  if (buildOptions.tsconfig) {
+    // assert typescript and ts-loader are installed
+    ['typescript', 'ts-loader'].forEach((dependency) => {
+      try {
+        require.resolve(dependency);
+      } catch (_) {
+        console.error(chalk.bold.red(`It looks like you're trying to use TypeScript but do not have '${chalk.bold(
+          dependency,
+        )}' installed. Please install it or remove the tsconfig flag.`));
+        process.exit(1);
+      }
+    });
+  }
+
+  if (!buildOptions.entrypoint) {
+    if (Object.keys(configFile).length) {
+      console.error(chalk.bold.red(`No ${chalk.bold('entrypoint')} property was specified in configuration file or package.json property`));
+    } else {
+      console.error(chalk.bold.red(`No ${chalk.bold('entry points')} were provided, ex. 'npx lifeomic-webpack src/lambdas'`));
+    }
+    process.exit(1);
+  }
+
+  console.info(JSON.stringify(buildOptions, null, 2));
+
   await compile(buildOptions);
 };
 

@@ -8,13 +8,16 @@ DIRECTORY="$(cd $(dirname ${BASH_SOURCE}); pwd)"
 export INTEGRATION_TEST_PROJECT_TMP_DIR=`mktemp -d`
 
 function installProject () {
-  cp -r ${DIRECTORY}/../fixtures/. ${INTEGRATION_TEST_PROJECT_TMP_DIR}/.
+  PROJECT_DIR="${INTEGRATION_TEST_PROJECT_TMP_DIR}/$1"
+  mkdir -p "${PROJECT_DIR}"
+  cp -r ${DIRECTORY}/../$1/. ${PROJECT_DIR}/.
 
-  cd ${INTEGRATION_TEST_PROJECT_TMP_DIR}
+  cd ${PROJECT_DIR}
 
   echo "registry=${YARN_NPM_REGISTRY_SERVER}" > .npmrc
 
   npm install
 }
 
-(installProject)
+(installProject testProject1)
+(installProject testProject2)

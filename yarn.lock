@@ -2462,6 +2462,8 @@ __metadata:
     babel-loader: ^8.2.3
     chalk: ^4.1.2
     core-js: ^3.21.1
+    cosmiconfig: ^7.0.1
+    cosmiconfig-typescript-loader: ^1.0.9
     esbuild: ^0.14.27
     glob: ^7.2.0
     jest: ^27.5.1
@@ -5801,7 +5803,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cosmiconfig@npm:^7.0.0":
+"cosmiconfig-typescript-loader@npm:^1.0.9":
+  version: 1.0.9
+  resolution: "cosmiconfig-typescript-loader@npm:1.0.9"
+  dependencies:
+    cosmiconfig: ^7
+    ts-node: ^10.7.0
+  peerDependencies:
+    "@types/node": "*"
+    cosmiconfig: ">=7"
+    typescript: ">=3"
+  checksum: 26a0198e03e81a9e7e1a6ce880d7309fdd056c7a3a23b587253e6d1d1224154d3f9edf727d9c0310628e89752353211b75de151b705298b4d0741fa1740c661e
+  languageName: node
+  linkType: hard
+
+"cosmiconfig@npm:^7, cosmiconfig@npm:^7.0.0, cosmiconfig@npm:^7.0.1":
   version: 7.0.1
   resolution: "cosmiconfig@npm:7.0.1"
   dependencies:

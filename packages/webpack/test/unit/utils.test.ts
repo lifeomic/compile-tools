@@ -6,7 +6,7 @@ import { promises as fs } from 'fs';
 import JSZip from 'jszip';
 
 import { handleWebpackResults, logger, makeFilePathRelativeToCwd, zipOutputFiles } from '../../src/utils';
-import { projectsDir } from '../fixtures';
+import { testProject1Dir } from '../testProject1';
 import { copyRecursive } from './helpers';
 
 let testBuildDir: string;
@@ -63,7 +63,7 @@ test('will return the relative portion of the path', () => {
 });
 
 test('zipOutputFiles will zip files for us', async () => {
-  await copyRecursive(join(projectsDir, 'zip'), testBuildDir);
+  await copyRecursive(join(testProject1Dir, 'zip'), testBuildDir);
   const entries = ['first.js', 'second.js', 'third/third.js'];
   await expect(zipOutputFiles(testBuildDir, entries)).resolves.not.toThrow();
   await Promise.all(entries.map(async (name) => {
