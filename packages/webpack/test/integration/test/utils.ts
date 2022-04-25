@@ -1,7 +1,16 @@
 import { SpawnSyncReturns } from 'child_process';
 import { logging } from '@lifeomic/test-tool-utils';
+import { testProject1DirName } from '../../testProject1';
+import { testProject2DirName } from '../../testProject2';
+import * as path from 'path';
 
 export const logger = logging.getLogger('integration-test');
+
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+export const tmpProjectDir = process.env.INTEGRATION_TEST_PROJECT_TMP_DIR!;
+
+export const tmpTestProject1Dir = path.join(tmpProjectDir, testProject1DirName);
+export const tmpTestProject2Dir = path.join(tmpProjectDir, testProject2DirName);
 
 export const handleSpawnResults = (results: SpawnSyncReturns<string | Buffer>) => {
   if (results.stdout.length) {

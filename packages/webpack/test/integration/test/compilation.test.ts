@@ -1,12 +1,13 @@
 import { spawnSync } from 'child_process';
-import { BUILD_ENV, handleSpawnResults } from './utils';
+import { BUILD_ENV, handleSpawnResults, tmpProjectDir, tmpTestProject1Dir, tmpTestProject2Dir } from './utils';
 
 import { ulid } from 'ulid';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import JsZip from 'jszip';
-import { getLambdaFile, Lambdas, tmpProjectDir } from '../../fixtures';
+import { Project1Lambdas } from '../../testProject1';
 import { fileExists } from '../../unit/helpers';
+import { getLambdaFile } from '../../shared/projects';
 
 let testBuildDir: string;
 
@@ -20,32 +21,48 @@ afterEach(async () => {
 });
 
 test('Lambda archives can be produced', async () => {
-  const bundle = join(testBuildDir, `${Lambdas.lambdaService}.js.zip`);
+  const bundle = join(testBuildDir, `${Project1Lambdas.lambdaService}.js.zip`);
   const result = spawnSync('npx', [
     'lifeomic-webpack',
     '-o', testBuildDir,
     '-z',
-    getLambdaFile({ lambda: Lambdas.lambdaService }),
+    getLambdaFile({ lambda: Project1Lambdas.lambdaService, projectDir: tmpTestProject1Dir }),
   ], {
-    cwd: tmpProjectDir,
+    cwd: tmpTestProject1Dir,
     env: BUILD_ENV,
   });
   handleSpawnResults(result);
 
   const zip = new JsZip();
   await zip.loadAsync(await fs.readFile(bundle));
-  expect(zip.file(`${Lambdas.lambdaService}.js`)).not.toBeNull();
+  expect(zip.file(`${Project1Lambdas.lambdaService}.js`)).not.toBeNull();
+});
+
+test('can use the config provided by the rc file or package.json', async () => {
+  const bundle = join(testBuildDir, `${Project1Lambdas.lambdaService}.js.zip`);
+  const result = spawnSync('npx', [
+    'lifeomic-webpack',
+    '-o', testBuildDir,
+  ], {
+    cwd: tmpTestProject2Dir,
+    env: BUILD_ENV,
+  });
+  handleSpawnResults(result);
+
+  const zip = new JsZip();
+  await zip.loadAsync(await fs.readFile(bundle));
+  expect(zip.file(`${Project1Lambdas.lambdaService}.js`)).not.toBeNull();
 });
 
 test('Lambda archives can be produced repeatedly', async () => {
-  const bundle = join(testBuildDir, `${Lambdas.lambdaService}.js.zip`);
+  const bundle = join(testBuildDir, `${Project1Lambdas.lambdaService}.js.zip`);
   const build = () => spawnSync('npx', [
     'lifeomic-webpack',
     '-o', testBuildDir,
     '-z',
-    getLambdaFile({ lambda: Lambdas.lambdaService }),
+    getLambdaFile({ lambda: Project1Lambdas.lambdaService, projectDir: tmpTestProject1Dir }),
   ], {
-    cwd: tmpProjectDir,
+    cwd: tmpTestProject1Dir,
     env: BUILD_ENV,
   });
 
@@ -54,48 +71,48 @@ test('Lambda archives can be produced repeatedly', async () => {
 
   const zip = new JsZip();
   await zip.loadAsync(await fs.readFile(bundle));
-  expect(zip.file(`${Lambdas.lambdaService}.js`)).not.toBeNull();
-  expect(zip.file(`${Lambdas.lambdaService}.js.zip`)).toBeNull();
+  expect(zip.file(`${Project1Lambdas.lambdaService}.js`)).not.toBeNull();
+  expect(zip.file(`${Project1Lambdas.lambdaService}.js.zip`)).toBeNull();
 });
 
 test('multiple bundles can be produced at one time', async () => {
   const result = spawnSync('npx', [
     'lifeomic-webpack',
     '-o', testBuildDir,
-    getLambdaFile({ lambda: Lambdas.lambdaService }),
-    getLambdaFile({ lambda: Lambdas.asyncTest }),
+    getLambdaFile({ lambda: Project1Lambdas.lambdaService, projectDir: tmpTestProject1Dir }),
+    getLambdaFile({ lambda: Project1Lambdas.asyncTest, projectDir: tmpTestProject1Dir }),
   ], {
-    cwd: tmpProjectDir,
+    cwd: tmpTestProject1Dir,
     env: BUILD_ENV,
   });
   handleSpawnResults(result);
-  await expect(fileExists(join(testBuildDir, `${Lambdas.lambdaService}.js`))).resolves.toBe(true);
-  await expect(fileExists(join(testBuildDir, `${Lambdas.asyncTest}.js`))).resolves.toBe(true);
+  await expect(fileExists(join(testBuildDir, `${Project1Lambdas.lambdaService}.js`))).resolves.toBe(true);
+  await expect(fileExists(join(testBuildDir, `${Project1Lambdas.asyncTest}.js`))).resolves.toBe(true);
 });
 
 test('multiple bundles can be produced at one time with mixed source types', async () => {
   const result = spawnSync('npx', [
     'lifeomic-webpack',
     '-o', testBuildDir,
-    getLambdaFile({ lambda: Lambdas.lambdaService }),
-    getLambdaFile({ lambda: Lambdas.tsLambdaService, ext: 'ts' }),
+    getLambdaFile({ lambda: Project1Lambdas.lambdaService, projectDir: tmpTestProject1Dir }),
+    getLambdaFile({ lambda: Project1Lambdas.tsLambdaService, ext: 'ts', projectDir: tmpTestProject1Dir }),
   ], {
-    cwd: tmpProjectDir,
+    cwd: tmpTestProject1Dir,
     env: BUILD_ENV,
   });
   handleSpawnResults(result);
-  await expect(fileExists(join(testBuildDir, `${Lambdas.lambdaService}.js`))).resolves.toBe(true);
-  await expect(fileExists(join(testBuildDir, `${Lambdas.tsLambdaService}.js`))).resolves.toBe(true);
+  await expect(fileExists(join(testBuildDir, `${Project1Lambdas.lambdaService}.js`))).resolves.toBe(true);
+  await expect(fileExists(join(testBuildDir, `${Project1Lambdas.tsLambdaService}.js`))).resolves.toBe(true);
 });
 
 test('bundles can use custom names', async () => {
   const result = spawnSync('npx', [
     'lifeomic-webpack',
     '-o', testBuildDir,
-    `${getLambdaFile({ lambda: Lambdas.lambdaService })}:service.js`,
-    `${getLambdaFile({ lambda: Lambdas.tsLambdaService, ext: 'ts' })}:lambda/tsService.js`,
+    `${getLambdaFile({ lambda: Project1Lambdas.lambdaService, projectDir: tmpTestProject1Dir })}:service.js`,
+    `${getLambdaFile({ lambda: Project1Lambdas.tsLambdaService, ext: 'ts', projectDir: tmpTestProject1Dir })}:lambda/tsService.js`,
   ], {
-    cwd: tmpProjectDir,
+    cwd: tmpTestProject1Dir,
     env: BUILD_ENV,
   });
   handleSpawnResults(result);
@@ -108,10 +125,10 @@ test('bundles with custom names can be zipped', async () => {
     'lifeomic-webpack',
     '-o', testBuildDir,
     '-z',
-    `${getLambdaFile({ lambda: Lambdas.lambdaService })}:service.js`,
-    `${getLambdaFile({ lambda: Lambdas.tsLambdaService, ext: 'ts' })}:lambda/tsService.js`,
+    `${getLambdaFile({ lambda: Project1Lambdas.lambdaService, projectDir: tmpTestProject1Dir })}:service.js`,
+    `${getLambdaFile({ lambda: Project1Lambdas.tsLambdaService, ext: 'ts', projectDir: tmpTestProject1Dir })}:lambda/tsService.js`,
   ], {
-    cwd: tmpProjectDir,
+    cwd: tmpTestProject1Dir,
     env: BUILD_ENV,
   });
   handleSpawnResults(result);
@@ -124,9 +141,9 @@ test('Expand input entrypoint directory into multiple entrypoints', async () => 
     'lifeomic-webpack',
     '-o', testBuildDir,
     '-z',
-    join(tmpProjectDir, 'multi-lambdas'),
+    join(tmpTestProject1Dir, 'multi-lambdas'),
   ], {
-    cwd: tmpProjectDir,
+    cwd: tmpTestProject1Dir,
     env: BUILD_ENV,
   });
   handleSpawnResults(result);

@@ -3,7 +3,12 @@ import * as allWebpack from 'webpack';
 import type { Stats, Compiler, Configuration } from 'webpack';
 import { mock, MockProxy } from 'jest-mock-extended';
 
-import { getLambdaFile, Lambdas } from '../fixtures';
+import { Project1Lambdas } from '../testProject1';
+
+import { compile } from '../../src';
+import * as rawConfig from '../../src/configure';
+import * as rawUtils from '../../src/utils';
+import { getLambdaFile } from '../shared/projects';
 
 jest.mock('../../src/configure');
 jest.mock('../../src/utils');
@@ -11,10 +16,6 @@ jest.mock('webpack', () => ({
   config: jest.requireActual('webpack').config,
   webpack: jest.fn(),
 }));
-
-import { compile } from '../../src/index';
-import * as rawConfig from '../../src/configure';
-import * as rawUtils from '../../src/utils';
 
 const { webpack } = allWebpack as MockProxy<typeof allWebpack>;
 const { createConfiguration } = rawConfig as MockProxy<typeof rawConfig>;
@@ -50,7 +51,7 @@ const setupEnv = (error?: Error) => {
 
 test('will orchestrate a build, and return result', async () => {
   const { webpackResult } = setupEnv();
-  await expect(compile({ entrypoint: getLambdaFile({ lambda: Lambdas.lambdaService }) })).resolves
+  await expect(compile({ entrypoint: getLambdaFile({ lambda: Project1Lambdas.lambdaService }) })).resolves
     .toBe(webpackResult);
 
   expect(handleWebpackResults).toBeCalledWith(webpackResult);
@@ -59,7 +60,7 @@ test('will orchestrate a build, and return result', async () => {
 
 test('will zip results', async () => {
   const { webpackResult, entries } = setupEnv();
-  await expect(compile({ entrypoint: getLambdaFile({ lambda: Lambdas.lambdaService }), zip: true })).resolves
+  await expect(compile({ entrypoint: getLambdaFile({ lambda: Project1Lambdas.lambdaService }), zip: true })).resolves
     .toBe(webpackResult);
 
   expect(handleWebpackResults).toBeCalledWith(webpackResult);
@@ -69,5 +70,5 @@ test('will zip results', async () => {
 test('will throw webpack exceptions', async () => {
   const error = new Error(ulid());
   setupEnv(error);
-  await expect(compile({ entrypoint: getLambdaFile({ lambda: Lambdas.lambdaService }) })).rejects.toThrow(error);
+  await expect(compile({ entrypoint: getLambdaFile({ lambda: Project1Lambdas.lambdaService }) })).rejects.toThrow(error);
 });
