@@ -4,6 +4,7 @@ set -x
 set -e
 
 DIRECTORY="$(cd $(dirname ${BASH_SOURCE}); pwd)"
+mkdir -p /tmp/verdaccio-workspace
 
 function runIntegrationTestCleanup() {
   if [ -n "${NPM_REGISTRY_PID}" ]; then
