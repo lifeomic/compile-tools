@@ -94,7 +94,7 @@ test('will zip output files', async () => {
     const relativeName = path.relative(testBuildDir, file);
     expect(zip.file(relativeName)).not.toBeNull();
   });
-});
+}, 30e3);
 
 test('will not run when errors', async () => {
   const stats = mock<Stats>();
