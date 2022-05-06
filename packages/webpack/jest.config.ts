@@ -1,3 +1,4 @@
+// @ts-ignore
 import { getProjectConfig, rootConfig, Config } from '../../jest.shared';
 
 const config: Config.InitialOptions = {
@@ -5,6 +6,9 @@ const config: Config.InitialOptions = {
   projects: [
     {
       ...getProjectConfig(__dirname),
+      moduleNameMapper: {
+        'pnpapi': '<rootDir>/../../.pnp.cjs',
+      },
     },
   ],
 };

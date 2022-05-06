@@ -6,12 +6,14 @@ import { loadPatch } from './patches';
 import path from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
 import { createRules } from './rules';
+import { ZipAssetsPlugin } from './zipAssetsPlugin';
+import { PatchPnpResolver } from './patchPnpResolver';
 
 const WEBPACK_DEFAULTS = webpackConfig.getNormalizedWebpackOptions({});
 webpackConfig.applyWebpackOptionsDefaults(WEBPACK_DEFAULTS);
 
 const CALLER_NODE_MODULES = 'node_modules';
-const LAMBDA_TOOLS_NODE_MODULES = path.resolve(__dirname, '..', 'node_modules');
+const LIB_NODE_MODULES = path.resolve(__dirname, '..', 'node_modules');
 
 export interface ConfigureResults {
   webpackConfig: Configuration;
@@ -28,9 +30,10 @@ export const createConfiguration = async (config: Config): Promise<ConfigureResu
     enableDnsRetry,
     outputPath = process.cwd(),
     minify,
+    zip,
   } = config;
   const entries = await getEntries(entrypoint, enableRuntimeSourceMaps);
-  const plugins = [
+  const plugins: Configuration['plugins'] = [
     new NormalModuleReplacementPlugin(/^any-promise$/, 'core-js/fn/promise'),
     new DefinePlugin({
       'global.GENTLY': false,
@@ -38,9 +41,11 @@ export const createConfiguration = async (config: Config): Promise<ConfigureResu
     }),
     await loadPatch('lambda'),
   ];
-
   if (enableDnsRetry) {
     plugins.push(await loadPatch('dns'));
+  }
+  if (zip) {
+    plugins.push(new ZipAssetsPlugin());
   }
 
   const outputDir = path.resolve(outputPath);
@@ -63,12 +68,19 @@ export const createConfiguration = async (config: Config): Promise<ConfigureResu
     // Since build is being called by other packages dependencies may be
     // relative to the caller or us. This cause our node modules to be
     // searched if a dependency can't be found in the caller's.
-    resolve.modules = [CALLER_NODE_MODULES, LAMBDA_TOOLS_NODE_MODULES];
+    resolve.modules = [CALLER_NODE_MODULES, LIB_NODE_MODULES];
 
     // Since build is being called by other packages dependencies may be
     // relative to the caller or us. This puts our node_modules on the
     // resolver path before trying to use the caller's.
-    resolveLoader.modules = [LAMBDA_TOOLS_NODE_MODULES, CALLER_NODE_MODULES];
+    resolveLoader.modules = [LIB_NODE_MODULES, CALLER_NODE_MODULES];
+  } else {
+    resolve.plugins = [
+      new PatchPnpResolver(),
+    ];
+    resolveLoader.plugins = [
+      new PatchPnpResolver(),
+    ];
   }
 
   const rawConfig: Configuration = {

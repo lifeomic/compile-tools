@@ -1,24 +1,21 @@
 import type { Stats } from 'webpack';
 import { mock } from 'jest-mock-extended';
 import { ulid } from 'ulid';
-import { join, basename, relative } from 'path';
+import path from 'path';
 import { promises as fs } from 'fs';
-import JSZip from 'jszip';
 
-import { handleWebpackResults, logger, makeFilePathRelativeToCwd, zipOutputFiles } from '../../src/utils';
-import { testProject1Dir } from '../testProject1';
-import { copyRecursive } from './helpers';
+import { handleWebpackResults, logger } from '../../src/utils';
 
 let testBuildDir: string;
 
 beforeEach(async () => {
   jest.spyOn(logger, 'info').mockReturnValue();
-  testBuildDir = join(__dirname, 'build', ulid());
+  testBuildDir = path.join(__dirname, 'build', ulid());
   await fs.mkdir(testBuildDir, { recursive: true });
 });
 
 afterEach(async () => {
-  // await fs.rm(testBuildDir, { recursive: true, force: true });
+  await fs.rm(testBuildDir, { recursive: true, force: true });
 });
 
 describe('handleWebpackResults', () => {
@@ -51,30 +48,3 @@ describe('handleWebpackResults', () => {
     });
   });
 });
-
-test('will return non cwd full file path', () => {
-  const file = '/dir/to/file.js';
-  expect(makeFilePathRelativeToCwd(file)).toBe(file);
-});
-
-test('will return the relative portion of the path', () => {
-  const expected = `./${relative(process.cwd(), __filename)}`;
-  expect(makeFilePathRelativeToCwd(__filename)).toBe(expected);
-});
-
-test('zipOutputFiles will zip files for us', async () => {
-  await copyRecursive(join(testProject1Dir, 'zip'), testBuildDir);
-  const entries = ['first.js', 'second.js', 'third/third.js'];
-  await expect(zipOutputFiles(testBuildDir, entries)).resolves.not.toThrow();
-  await Promise.all(entries.map(async (name) => {
-    const zip = new JSZip();
-    const zipFileName = join(testBuildDir, `${name}.zip`);
-    await expect(fs.stat(zipFileName)).resolves.not.toThrow();
-    await zip.loadAsync(await fs.readFile(zipFileName));
-    expect(zip.file(basename(name))).not.toBeNull();
-    if (name === 'second.js') {
-      expect(zip.file(`${name}.png`)).not.toBeNull();
-    }
-  }));
-});
-
