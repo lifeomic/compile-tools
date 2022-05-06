@@ -8,7 +8,7 @@ import * as path from 'path';
 export const logger = logging.getLogger('integration-test');
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-export const tmpProjectDir = process.env.INTEGRATION_TEST_PROJECT_TMP_DIR!;
+export const tmpProjectDir = process.env.INTEGRATION_TEST_TMP_DIR!;
 
 export const tmpTestProject1Dir = path.join(tmpProjectDir, testProject1DirName);
 export const tmpTestProject2Dir = path.join(tmpProjectDir, testProject2DirName);

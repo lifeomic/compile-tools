@@ -5,16 +5,8 @@ set -e
 
 DIRECTORY="$(cd $(dirname ${BASH_SOURCE}); pwd)"
 
-export INTEGRATION_TEST_PROJECT_TMP_DIR=`mktemp -d`
-
-#function cleanup() {
-#  rm -rf "${INTEGRATION_TEST_PROJECT_TMP_DIR}"
-#}
-#
-#trap_add cleanup EXIT
-
 function installNpmProject () {
-  PROJECT_DIR="${INTEGRATION_TEST_PROJECT_TMP_DIR}/$1"
+  PROJECT_DIR="${INTEGRATION_TEST_TMP_DIR}/$1"
   mkdir -p "${PROJECT_DIR}"
   cp -r ${DIRECTORY}/../$1/. ${PROJECT_DIR}/.
 
@@ -22,11 +14,11 @@ function installNpmProject () {
 
   echo "registry=${YARN_NPM_REGISTRY_SERVER}" > .npmrc
 
-  npm install
+  npm install > /dev/null
 }
 
 function installYarnProject () {
-  PROJECT_DIR="${INTEGRATION_TEST_PROJECT_TMP_DIR}/$1"
+  PROJECT_DIR="${INTEGRATION_TEST_TMP_DIR}/$1"
   mkdir -p "${PROJECT_DIR}"
   cp -r ${DIRECTORY}/../$1/. ${PROJECT_DIR}/.
 
@@ -38,7 +30,7 @@ function installYarnProject () {
 
   echo "npmRegistryServer: \"${YARN_NPM_REGISTRY_SERVER}\""
 
-  yarn install --check-cache
+  yarn install --check-cache > /dev/null
 }
 
 (installNpmProject testProject1)

@@ -9,8 +9,8 @@
   "scripts": {
     "g:test": "cd $INIT_CWD && jest --runInBand --detectOpenHandles --forceExit",
     "test": "yarn workspaces foreach --exclude compile-tools run test",
-    "g:integration-test": "./tools/runIntegrationTest.sh",
-    "integration-test": "yarn workspaces foreach --exclude compile-tools run integration-test",
+    "g:integration-test": "./tools/preIntegrationTest.sh",
+    "integration-test": "./tools/runIntegrationTest.sh",
     "prelint": "yarn constraints",
     "lint": "yarn prelint && yarn eslint . --cache && yarn postlint",
     "postlint": "yarn tsc",
