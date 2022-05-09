@@ -1,3 +1,4 @@
+// @ts-ignore
 import { getProjectConfig, rootConfig, Config } from '../../jest.shared';
 
 const config: Config.InitialOptions = {

@@ -1,5 +1,5 @@
 import { spawnSync } from 'child_process';
-import { BUILD_ENV, handleSpawnResults, tmpProjectDir, tmpTestProject1Dir, tmpTestProject2Dir } from './utils';
+import { BUILD_ENV, handleSpawnResults, tmpProjectDir, tmpTestProject1Dir, tmpTestProject2Dir, tmpTestProject3Dir } from './utils';
 
 import { ulid } from 'ulid';
 import { promises as fs } from 'fs';
@@ -8,6 +8,10 @@ import JsZip from 'jszip';
 import { Project1Lambdas } from '../../testProject1';
 import { fileExists } from '../../unit/helpers';
 import { getLambdaFile } from '../../shared/projects';
+import path from 'path';
+import rawGlob from 'glob';
+import { promisify } from 'util';
+const glob = promisify(rawGlob);
 
 let testBuildDir: string;
 
@@ -52,6 +56,31 @@ test('can use the config provided by the rc file or package.json', async () => {
   const zip = new JsZip();
   await zip.loadAsync(await fs.readFile(bundle));
   expect(zip.file(`${Project1Lambdas.lambdaService}.js`)).not.toBeNull();
+});
+
+test('works for yarn berry', async () => {
+  const bundle = join(testBuildDir, 'sharp.js.zip');
+  const result = spawnSync('yarn', [
+    'lifeomic-webpack',
+    '-o', testBuildDir,
+    '-z',
+    join(tmpTestProject3Dir, 'sharp.ts'),
+  ], {
+    cwd: tmpTestProject3Dir,
+    env: BUILD_ENV,
+    encoding: 'utf-8',
+  });
+  handleSpawnResults(result);
+
+  const files = await glob(path.join(testBuildDir, 'node-file-*.node'));
+  const zip = new JsZip();
+  await zip.loadAsync(await fs.readFile(bundle));
+
+  expect(zip.file('sharp.js')).not.toBeNull();
+  files.forEach((file) => {
+    const relativeName = path.relative(testBuildDir, file);
+    expect(zip.file(relativeName)).not.toBeNull();
+  });
 });
 
 test('Lambda archives can be produced repeatedly', async () => {

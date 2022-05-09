@@ -1,8 +1,10 @@
 import { join } from 'path';
 import { Project1Lambdas, testProject1Dir } from '../testProject1';
+import { Project2Lambdas } from '../testProject2';
+import { Project3Lambdas } from '../testProject3';
 
 export interface GetServiceLambdaFile {
-  lambda: Project1Lambdas;
+  lambda: Project1Lambdas | Project2Lambdas | Project3Lambdas;
   ext?: 'js' | 'ts';
   projectDir?: string;
 }

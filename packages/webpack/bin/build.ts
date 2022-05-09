@@ -164,8 +164,6 @@ const prep = async () => {
     process.exit(1);
   }
 
-  console.info(JSON.stringify(buildOptions, null, 2));
-
   await compile(buildOptions);
 };
 
