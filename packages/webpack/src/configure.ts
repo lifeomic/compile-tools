@@ -6,6 +6,7 @@ import { loadPatch } from './patches';
 import path from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
 import { createRules } from './rules';
+import { ZipAssetsPlugin } from './zipAssetsPlugin';
 import { PatchPnpResolver } from './patchPnpResolver';
 
 const WEBPACK_DEFAULTS = webpackConfig.getNormalizedWebpackOptions({});
@@ -29,6 +30,7 @@ export const createConfiguration = async (config: Config): Promise<ConfigureResu
     enableDnsRetry,
     outputPath = process.cwd(),
     minify,
+    zip,
   } = config;
   const entries = await getEntries(entrypoint, enableRuntimeSourceMaps);
   const plugins: Configuration['plugins'] = [
@@ -42,6 +44,9 @@ export const createConfiguration = async (config: Config): Promise<ConfigureResu
 
   if (enableDnsRetry) {
     plugins.push(await loadPatch('dns'));
+  }
+  if (zip) {
+    plugins.push(new ZipAssetsPlugin());
   }
 
   const outputDir = path.resolve(outputPath);

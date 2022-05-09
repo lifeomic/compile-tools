@@ -49,3 +49,4 @@ function installYarnProject () {
 
 (installNpmProject testProject1)
 (installNpmProject testProject2)
+(installYarnProject testProject3)
