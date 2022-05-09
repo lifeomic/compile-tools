@@ -6,13 +6,6 @@
 # https://github.com/verdaccio/verdaccio/tree/master/conf
 #
 
-# path to a directory with all packages
-storage: /tmp/verdaccio-workspace/storage
-
-auth:
-  htpasswd:
-    file: /tmp/verdaccio-workspace/htpasswd
-
 # a list of other known repositories we can talk to
 uplinks:
   npmjs:
