@@ -8,6 +8,7 @@ import { loadPatch } from '../../src/patches';
 
 import { Project1Lambdas } from '../testProject1';
 import { getLambdaFile } from '../shared/projects';
+import { PatchPnpResolver } from '../../src/patchPnpResolver';
 
 const CALLER_NODE_MODULES = 'node_modules';
 const LAMBDA_TOOLS_NODE_MODULES = resolve(__dirname, '..', '..', 'node_modules');
@@ -60,8 +61,11 @@ test('will set defaults', async () => {
     },
     resolve: {
       extensions: ['.js', '.ts', '.mjs', '.cjs'],
+      plugins: [expect.any(PatchPnpResolver)],
     },
-    resolveLoader: {},
+    resolveLoader: {
+      plugins: [expect.any(PatchPnpResolver)],
+    },
     devtool: undefined,
     optimization: { minimize: false },
     mode: 'production',
@@ -107,8 +111,11 @@ test('can override defaults', async () => {
     },
     resolve: {
       extensions: ['.js', '.ts', '.mjs', '.cjs'],
+      plugins: [expect.any(PatchPnpResolver)],
     },
-    resolveLoader: {},
+    resolveLoader: {
+      plugins: [expect.any(PatchPnpResolver)],
+    },
     devtool: 'source-map',
     optimization: expect.objectContaining({ minimize: true }),
     mode: 'development',

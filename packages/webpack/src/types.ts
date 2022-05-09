@@ -4,7 +4,7 @@ import {
 
 export type Mode = 'development' | 'production' | 'none';
 
-export type ConfigTransformer = (config: Configuration) => Promise<Configuration>
+export type ConfigTransformer = (config: Configuration) => Promise<Configuration> | Configuration
 
 export interface Config {
   entrypoint: string | string[];

@@ -5,6 +5,9 @@ const config: Config.InitialOptions = {
   projects: [
     {
       ...getProjectConfig(__dirname),
+      moduleNameMapper: {
+        'pnpapi': '<rootDir>/../../.pnp.cjs',
+      },
     },
   ],
 };
