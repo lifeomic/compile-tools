@@ -28,24 +28,11 @@ const transform: Config.InitialProjectOptions['transform'] = {
 };
 
 export const rootConfig: Config.InitialOptions = {
+  rootDir: __dirname,
+  coverageDirectory: '<rootDir>/coverage',
   preset: '@lifeomic/jest-config',
   testEnvironment: 'node',
   collectCoverage: true,
-  collectCoverageFrom: [
-    '<rootDir>/src/**/*.ts',
-  ],
-  coverageThreshold: {
-    global: {
-      branches: 100,
-      functions: 100,
-      lines: 100,
-      statements: 100,
-    },
-  },
-  coveragePathIgnorePatterns: [
-    '.yarn',
-    '<rootDir>/test',
-  ],
   clearMocks: true,
   restoreMocks: true,
   resetMocks: true,
@@ -65,6 +52,21 @@ const projectConfigsMap = packages.reduce<Record<string, Config.InitialProjectOp
     clearMocks: true,
     restoreMocks: true,
     resetMocks: true,
+    collectCoverageFrom: [
+      '<rootDir>/src/**/*.ts',
+    ],
+    coverageThreshold: {
+      global: {
+        branches: 100,
+        functions: 100,
+        lines: 100,
+        statements: 100,
+      },
+    },
+    coveragePathIgnorePatterns: [
+      '.yarn',
+      '<rootDir>/test',
+    ],
   },
 }), {} as Record<string, Config.InitialProjectOptions>);
 

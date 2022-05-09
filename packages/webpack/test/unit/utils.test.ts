@@ -18,7 +18,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  // await fs.rm(testBuildDir, { recursive: true, force: true });
+  await fs.rm(testBuildDir, { recursive: true, force: true });
 });
 
 describe('handleWebpackResults', () => {
