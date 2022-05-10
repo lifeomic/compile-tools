@@ -17,13 +17,14 @@ export VERDACCIO_STORAGE_PATH="${INTEGRATION_TEST_TMP_ROOT_DIR}/verdaccio"
 mkdir -p "${VERDACCIO_STORAGE_PATH}"
 
 tmp_registry_log="${VERDACCIO_STORAGE_PATH}/registryLog.txt"
+echo "" > "${tmp_registry_log}"
 
 export NPM_REGISTRY_PORT="$(yarn ts-node ${TOOLS_DIR}/getPort.ts)"
-yarn verdaccio --listen ${NPM_REGISTRY_PORT} --config "${TOOLS_DIR}/verdaccio-config.yaml" &> ${tmp_registry_log}  &
+yarn verdaccio --listen ${NPM_REGISTRY_PORT} --config "${TOOLS_DIR}/verdaccio-config.yaml" &> "${tmp_registry_log}"  &
 export NPM_REGISTRY_PID=$!
 
 # wait for `verdaccio` to boot
-grep -q 'http address' <(tail -f ${tmp_registry_log})
+grep -q 'http address' <(tail -f "${tmp_registry_log}")
 
 custom_registry_url="http://localhost:${NPM_REGISTRY_PORT}"
 
