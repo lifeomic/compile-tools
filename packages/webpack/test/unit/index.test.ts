@@ -19,7 +19,7 @@ jest.mock('webpack', () => ({
 
 const { webpack } = allWebpack as MockProxy<typeof allWebpack>;
 const { createConfiguration } = rawConfig as MockProxy<typeof rawConfig>;
-const { handleWebpackResults, zipOutputFiles } = rawUtils as MockProxy<typeof rawUtils>;
+const { handleWebpackResults } = rawUtils as MockProxy<typeof rawUtils>;
 
 const setupEnv = (error?: Error) => {
   const webpackResult = mock<Stats>();
@@ -55,16 +55,6 @@ test('will orchestrate a build, and return result', async () => {
     .toBe(webpackResult);
 
   expect(handleWebpackResults).toBeCalledWith(webpackResult);
-  expect(zipOutputFiles).not.toBeCalled();
-});
-
-test('will zip results', async () => {
-  const { webpackResult, entries } = setupEnv();
-  await expect(compile({ entrypoint: getLambdaFile({ lambda: Project1Lambdas.lambdaService }), zip: true })).resolves
-    .toBe(webpackResult);
-
-  expect(handleWebpackResults).toBeCalledWith(webpackResult);
-  expect(zipOutputFiles).toBeCalledWith(__dirname, Object.keys(entries));
 });
 
 test('will throw webpack exceptions', async () => {
