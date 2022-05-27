@@ -51,7 +51,7 @@ export const createConfig = async (cwd: string): Promise<MonoRepoSemReleaseConte
 
 export const getNextVersion = async (
   { plugins, context }: MonoRepoSemReleaseContext,
-): Promise<ReleaseType | undefined> => {
+): Promise<string | null | undefined> => {
   const type = await plugins.analyzeCommits(context);
   return type ? inc(context.lastRelease?.version ?? '0.0.0', type) : undefined;
 };

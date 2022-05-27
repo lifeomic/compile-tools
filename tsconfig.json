@@ -12,8 +12,5 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "rootDir": ".",
-  },
-  "include": [
-    "./*.ts"
-  ]
+  }
 }
