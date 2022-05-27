@@ -52,9 +52,6 @@ const projectConfigsMap = packages.reduce<Record<string, Config.InitialProjectOp
     clearMocks: true,
     restoreMocks: true,
     resetMocks: true,
-    collectCoverageFrom: [
-      '<rootDir>/src/**/*.ts',
-    ],
     coverageThreshold: {
       global: {
         branches: 100,
@@ -86,6 +83,9 @@ export const rootIntegrationConfig: Config.InitialOptions = {
 const projectIntegrationConfigsMap = packages.reduce<Record<string, Config.InitialProjectOptions>>((acc, packageName, idx) => ({
   ...acc,
   [packageName]: {
+    collectCoverageFrom: [
+      '<rootDir>/src/**/*.ts',
+    ],
     rootDir: path.join(basePath, packageName),
     displayName: { name: packageName, color: colors[idx % colors.length] },
     testMatch: ['<rootDir>/test/integration/**/*.test.ts'],
