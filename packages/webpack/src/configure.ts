@@ -8,6 +8,7 @@ import TerserPlugin from 'terser-webpack-plugin';
 import { createRules } from './rules';
 import { ZipAssetsPlugin } from './zipAssetsPlugin';
 import { PatchPnpResolver } from './patchPnpResolver';
+import { AssetsDirPlugin } from './assetsDirPlugin';
 
 const WEBPACK_DEFAULTS = webpackConfig.getNormalizedWebpackOptions({});
 webpackConfig.applyWebpackOptionsDefaults(WEBPACK_DEFAULTS);
@@ -31,6 +32,7 @@ export const createConfiguration = async (config: Config): Promise<ConfigureResu
     outputPath = process.cwd(),
     minify,
     zip,
+    folderBased,
   } = config;
   const entries = await getEntries(entrypoint, enableRuntimeSourceMaps);
   const plugins: Configuration['plugins'] = [
@@ -47,6 +49,9 @@ export const createConfiguration = async (config: Config): Promise<ConfigureResu
   }
   if (zip) {
     plugins.push(new ZipAssetsPlugin());
+  }
+  if (folderBased) {
+    plugins.push(new AssetsDirPlugin());
   }
 
   const outputDir = path.resolve(outputPath);

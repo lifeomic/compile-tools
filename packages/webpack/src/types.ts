@@ -19,4 +19,5 @@ export interface Config {
   minify?: boolean;
   configTransformer?: ConfigTransformer;
   zip?: boolean;
+  folderBased?: boolean;
 }
