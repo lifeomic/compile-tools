@@ -1,4 +1,4 @@
-import {
+import type {
   Configuration,
 } from 'webpack';
 
@@ -19,4 +19,5 @@ export interface Config {
   minify?: boolean;
   configTransformer?: ConfigTransformer;
   zip?: boolean;
+  folderBased?: boolean;
 }

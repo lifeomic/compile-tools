@@ -70,6 +70,7 @@ test('will set defaults', async () => {
     optimization: { minimize: false },
     mode: 'production',
   }));
+  expect(configuration.webpackConfig.plugins).toHaveLength(3);
   expect(configuration).toHaveProperty('outputDir', process.cwd());
   expect(configuration).toHaveProperty('entries', defaultEntryPoint);
   expect(NormalModuleReplacementPlugin).toBeCalledWith(/^any-promise$/, 'core-js/fn/promise');
@@ -97,6 +98,8 @@ test('can override defaults', async () => {
     enableDnsRetry: true,
     outputPath,
     minify: true,
+    zip: true,
+    folderBased: true,
   });
   const entries = {
     [`${Project1Lambdas.tsLambdaService}.js`]: ['source-map-support/register', getLambdaFile({ lambda: Project1Lambdas.tsLambdaService, ext: 'ts' })],
@@ -121,6 +124,7 @@ test('can override defaults', async () => {
     mode: 'development',
     watch: true,
   }));
+  expect(configuration.webpackConfig.plugins).toHaveLength(6);
   expect(configuration).toHaveProperty('outputDir', outputPath);
   expect(configuration).toHaveProperty('entries', entries);
   expect(NormalModuleReplacementPlugin).toBeCalledWith(/^any-promise$/, 'core-js/fn/promise');

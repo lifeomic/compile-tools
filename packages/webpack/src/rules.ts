@@ -48,7 +48,7 @@ export const createRules = (
           loader: 'ts-loader',
           options: {
             configFile: tsconfig,
-            transpileOnly: transpileOnly,
+            transpileOnly,
           },
         },
       ],
