@@ -12,9 +12,9 @@ export const fsStat = async (...filePath: string[]): Promise<Stats | undefined> 
 export const fileExists = async (...filePath: string[]) => {
   const stat = await fsStat(...filePath);
   return stat && stat.isFile();
-}
+};
 
 export const dirExists = async (...filePath: string[]) => {
   const stat = await fsStat(...filePath);
   return stat && stat.isDirectory();
-}
+};

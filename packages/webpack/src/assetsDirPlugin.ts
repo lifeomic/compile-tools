@@ -18,10 +18,10 @@ export const copyAssets = async (
     await Promise.all(filesToCopy.map(async (file) => {
       const destDir = path.join(outDir, file);
       await fs.mkdir(path.dirname(destDir), { recursive: true });
-      await fs.copyFile(path.join(outputDir, file), destDir)
+      await fs.copyFile(path.join(outputDir, file), destDir);
     }));
   }));
-}
+};
 
 export const processStats = async (
   logger: WebpackLogger,
