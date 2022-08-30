@@ -15,23 +15,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
-      - run: (command -v corepack >/dev/null 2>&1 && corepack enable) || (npm uninstall -g yarn pnpm && npm i -g corepack)
       - run: yarn install --immutable
       - run: yarn test
       - run: yarn workspaces foreach --no-private run integration-test
-      - name: Coveralls
-        uses: coverallsapp/github-action@v1.1.2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: coverage/lcov.info
-          flag-name: run-${{ matrix.node }}
-          parallel: true
-  finish:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Coveralls Finished
-        uses: coverallsapp/github-action@v1.1.2
-        with:
-          github-token: ${{ secrets.github_token }}
-          parallel-finished: true

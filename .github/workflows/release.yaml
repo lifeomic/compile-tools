@@ -18,16 +18,9 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org
           cache: 'yarn'
-      - run: (command -v corepack >/dev/null 2>&1 && corepack enable) || (npm uninstall -g yarn pnpm && npm i -g corepack)
       - run: yarn install --immutable
       - run: yarn test
       - run: yarn workspaces foreach --no-private run integration-test
-      - name: Coverage Report
-        uses: coverallsapp/github-action@v1.1.2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: coverage/lcov.info
-          flag-name: master
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -50,9 +50,7 @@ test('will copy files to output dir', async () => {
   await expect(fileExists(testBuildDir, 'sharp.js.dir', 'sharp.js')).resolves.toBe(true);
 
   const files = await glob(path.join('build', 'release', '*.node'), { cwd: testBuildDir });
-  await Promise.all(files.map(async (file) => {
-    await expect(fileExists(testBuildDir, 'sharp.js.dir', file));
-  }));
+  await Promise.all(files.map((file) => expect(fileExists(testBuildDir, 'sharp.js.dir', file))));
 }, 30e3);
 
 
