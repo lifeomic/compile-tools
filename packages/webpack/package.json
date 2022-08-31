@@ -52,7 +52,7 @@
     "lodash": "^4.17.21",
     "node-loader": "^2.0.0",
     "serverless-http": "^2.7.0",
-    "sharp": "^0.30.4",
+    "sharp": "^0.30.5",
     "tapable": "^2.2.1",
     "ts-jest": "^28.0.3",
     "ts-node": "^10.8.0",
