@@ -44,7 +44,7 @@
     "verdaccio": "^5.10.2"
   },
   "engines": {
-    "node": ">=14.14.0"
+    "node": ">=18"
   },
   "repository": {
     "directory": ".",

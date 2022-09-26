@@ -1,5 +1,10 @@
 % Enforces the engines.node field for all workspaces
-gen_enforced_field(WorkspaceCwd, 'engines.node', '>=14.14.0').
+gen_enforced_field(WorkspaceCwd, 'engines.node', '>=14.14.0') :-
+  \+ workspace_field(WorkspaceCwd, 'name', 'compile-tools').
+
+% Enforces the engines.node field for all workspaces
+gen_enforced_field(WorkspaceCwd, 'engines.node', '>=18') :-
+  workspace_field(WorkspaceCwd, 'name', 'compile-tools').
 
 % Enforces the version for all projects as 0.0.0
 gen_enforced_field(WorkspaceCwd, 'version', '0.0.0').

@@ -13,8 +13,8 @@ const hooks = localStackHooks({ services: ['lambda'], versionTag: '0.14' });
 const testBuildDir = join(tmpProjectDir, 'build', ulid());
 
 const supportedNodeVersions = [
-  '12',
   '14',
+  '16',
 ] as const;
 type NodeVersion = typeof supportedNodeVersions[number];
 
