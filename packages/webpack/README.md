@@ -42,6 +42,7 @@ or from the following config files.
 | nodeVersion?: string; 14.14.0          | Version of node that the output should be compatible with, defaults to                 |                  
 | cacheDirectory?: boolean;              | For babel-loader                                                                       |              
 | enableDnsRetry?: boolean;              | [dns retry](src/patches/dnsPatch.js)                                                   |              
+| enableLambdaPatch?: boolean;           | [lambda patch](src/patches/lambdaPatch.js)                                             |              
 | outputPath?: string; process.cwd()     | Output of webpack files                                                                |                   
 | enableRuntimeSourceMaps?: boolean;     | [devtool source-map](https://webpack.js.org/configuration/devtool/)                    |     
 | tsconfig?: string;                     | tsconfig.json file to use, will use ts-loader instead of babel-loader                  |                     
@@ -50,6 +51,10 @@ or from the following config files.
 | configTransformer?: ConfigTransformer; | Function to add/alter the webpack config before sending to Webpack                     | 
 | zip?: boolean;                         | Zip output files for each entrypoint: `entrypoint.js.zip`                              |                         
 | folderBased?: boolean;                 | Send output files to a directory for each entrypoint `entrypoint.js.dir`               |                 
+| addBabelLoader?: boolean;              | Use babel to compile webpacked resources                                               |                 
+| addTsLoader?: boolean;                 | Use babel and ts-loader to compile webpacked resources                                 |                 
+| addSwcLoader?: boolean;                | Use swc to compile webpacked resources                                                 |                 
+| addEsbuildLoader?: boolean;            | Use esbuild to compile webpacked resources                                             |                 
 
 
 ### Folder vs Zip output on Terraform
@@ -115,3 +120,15 @@ minification in the final output bundle.
 
 To enable debug level logging we are using the [debug][debug] library to create the log lines.
 Debug flag: `lifeomic-webpack`
+
+## Loader Configs
+
+### babel
+
+#### peer dependencies
+@babel/core"
+@babel/preset-env"
+@babel/preset-typescript"
+@babel/runtime-corejs3"
+babel-loader
+webpack-babel-env-deps

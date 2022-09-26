@@ -70,13 +70,15 @@ test('will zip output files', async () => {
     entrypoint: path.join(testProject3ir, 'sharp.ts'),
     zip: true,
     configTransformer: (config) => {
-      config.module!.rules!.push({
-        test: /\.node$/,
-        loader: 'node-loader',
-        options: {
-          name: 'node-file-[contentHash].[ext]',
-        },
-      });
+      config.module = {
+        rules: [{
+          test: /\.node$/,
+          loader: 'node-loader',
+          options: {
+            name: 'node-file-[contentHash].[ext]',
+          },
+        }],
+      };
       return config;
     },
   };

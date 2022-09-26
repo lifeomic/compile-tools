@@ -1,7 +1,7 @@
 import { ulid } from 'ulid';
 import { resolve } from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
-import { DefinePlugin, NormalModuleReplacementPlugin } from 'webpack';
+import { DefinePlugin } from 'webpack';
 
 import { createConfiguration } from '../../src/configure';
 import { loadPatch } from '../../src/patches';
@@ -70,15 +70,14 @@ test('will set defaults', async () => {
     optimization: { minimize: false },
     mode: 'production',
   }));
-  expect(configuration.webpackConfig.plugins).toHaveLength(3);
+  expect(configuration.webpackConfig.plugins).toHaveLength(1);
   expect(configuration).toHaveProperty('outputDir', process.cwd());
   expect(configuration).toHaveProperty('entries', defaultEntryPoint);
-  expect(NormalModuleReplacementPlugin).toBeCalledWith(/^any-promise$/, 'core-js/fn/promise');
   expect(DefinePlugin).toBeCalledWith({
     'global.GENTLY': false,
     'process.env.LIFEOMIC_SERVICE_NAME': '\'test-service\'',
   });
-  expect(loadPatch).toBeCalledWith('lambda');
+  expect(loadPatch).not.toBeCalledWith('lambda');
   expect(loadPatch).not.toBeCalledWith('dns');
 });
 
@@ -96,6 +95,7 @@ test('can override defaults', async () => {
     configTransformer,
     enableRuntimeSourceMaps: true,
     enableDnsRetry: true,
+    enableLambdaPatch: true,
     outputPath,
     minify: true,
     zip: true,
@@ -124,10 +124,9 @@ test('can override defaults', async () => {
     mode: 'development',
     watch: true,
   }));
-  expect(configuration.webpackConfig.plugins).toHaveLength(6);
+  expect(configuration.webpackConfig.plugins).toHaveLength(5);
   expect(configuration).toHaveProperty('outputDir', outputPath);
   expect(configuration).toHaveProperty('entries', entries);
-  expect(NormalModuleReplacementPlugin).toBeCalledWith(/^any-promise$/, 'core-js/fn/promise');
   expect(TerserPlugin).toBeCalledWith({ terserOptions: { sourceMap: true } });
   expect(DefinePlugin).toBeCalledWith({
     'global.GENTLY': false,

@@ -33,13 +33,15 @@ test('will copy files to output dir', async () => {
     entrypoint: path.join(testProject3ir, 'sharp.ts'),
     folderBased: true,
     configTransformer: (config) => {
-      config.module!.rules!.push({
-        test: /\.node$/,
-        loader: 'node-loader',
-        options: {
-          name: 'build/release/[contentHash].[ext]',
-        },
-      });
+      config.module = {
+        rules: [{
+          test: /\.node$/,
+          loader: 'node-loader',
+          options: {
+            name: 'build/release/[contentHash].[ext]',
+          },
+        }],
+      };
       return config;
     },
   };

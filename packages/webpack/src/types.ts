@@ -20,4 +20,9 @@ export interface Config {
   configTransformer?: ConfigTransformer;
   zip?: boolean;
   folderBased?: boolean;
+  enableLambdaPatch?: boolean;
+  addBabelLoader?: boolean;
+  addTsLoader?: boolean;
+  addSwcLoader?: boolean;
+  addEsbuildLoader?: boolean;
 }

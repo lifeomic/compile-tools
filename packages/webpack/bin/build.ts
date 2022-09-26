@@ -61,6 +61,10 @@ const argv = yargs(process.argv.slice(2))
     describe: 'enable automatic retries for DNS lookups',
     type: 'boolean',
   })
+  .option('lambda-patch', {
+    describe: 'Patch the lambda handler',
+    type: 'boolean',
+  })
   .option('n', {
     alias: 'node-version',
     describe: 'the version of node that the bundle should be optimized for (default 12.13.0)',
@@ -109,6 +113,22 @@ const argv = yargs(process.argv.slice(2))
     describe: 'enables babel-loader cache directory',
     type: 'boolean',
   })
+  .options('babel-loader', {
+    describe: 'Use the babel loader rules for Typescript and javascript',
+    type: 'boolean',
+  })
+  .options('ts-loader', {
+    describe: 'Use the ts-loader rules for Typescript and javascript',
+    type: 'boolean',
+  })
+  .options('esbuild-loader', {
+    describe: 'Use the esbuild loader rules for Typescript and javascript',
+    type: 'boolean',
+  })
+  .options('swc-loader', {
+    describe: 'Use the swc loader rules for Typescript and javascript',
+    type: 'boolean',
+  })
   .epilog(epilogue)
   .parseSync();
 
@@ -124,6 +144,11 @@ const buildOptions: Config = {
   transpileOnly: argv.transpileOnly,
   enableRuntimeSourceMaps: argv.enableRuntimeSourceMaps,
   cacheDirectory: argv.enableCacheDirectory,
+  enableLambdaPatch: argv.lambdaPatch,
+  addBabelLoader: argv.babelLoader,
+  addTsLoader: argv.tsLoader,
+  addSwcLoader: argv.swcLoader,
+  addEsbuildLoader: argv.esbuildLoader,
 };
 
 const prep = async () => {

@@ -2732,14 +2732,7 @@ __metadata:
     yargs: ^17.3.1
     zip-webpack-plugin: ^4.0.1
   peerDependencies:
-    "@babel/core": ^7.17.5
-    "@babel/preset-env": ^7.16.11
-    "@babel/preset-typescript": ^7.16.7
-    "@babel/runtime-corejs3": ^7.17.2
     "@types/node": ">=14.18.12"
-    babel-loader: ^8.2.3
-    core-js: ^3.21.1
-    ts-loader: ^9.2.8
   bin:
     lifeomic-webpack: ./bin/build.js
   languageName: unknown
