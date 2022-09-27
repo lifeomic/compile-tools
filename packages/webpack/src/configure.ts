@@ -1,17 +1,14 @@
 import type { Config, Mode } from './types';
-import { config as webpackConfig, DefinePlugin, NormalModuleReplacementPlugin } from 'webpack';
+import { DefinePlugin } from 'webpack';
 import type { Configuration } from 'webpack';
 import { getEntries } from './entries';
 import { loadPatch } from './patches';
 import path from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
-import { createRules } from './rules';
 import { ZipAssetsPlugin } from './zipAssetsPlugin';
 import { PatchPnpResolver } from './patchPnpResolver';
 import { AssetsDirPlugin } from './assetsDirPlugin';
-
-const WEBPACK_DEFAULTS = webpackConfig.getNormalizedWebpackOptions({});
-webpackConfig.applyWebpackOptionsDefaults(WEBPACK_DEFAULTS);
+import { setupLoaders } from './loaders';
 
 const CALLER_NODE_MODULES = 'node_modules';
 const LIB_NODE_MODULES = path.resolve(__dirname, '..', 'node_modules');
@@ -29,6 +26,7 @@ export const createConfiguration = async (config: Config): Promise<ConfigureResu
     configTransformer = (config: Configuration) => Promise.resolve(config),
     enableRuntimeSourceMaps,
     enableDnsRetry,
+    enableLambdaPatch,
     outputPath = process.cwd(),
     minify,
     zip,
@@ -36,13 +34,15 @@ export const createConfiguration = async (config: Config): Promise<ConfigureResu
   } = config;
   const entries = await getEntries(entrypoint, enableRuntimeSourceMaps);
   const plugins: Configuration['plugins'] = [
-    new NormalModuleReplacementPlugin(/^any-promise$/, 'core-js/fn/promise'),
     new DefinePlugin({
       'global.GENTLY': false,
       'process.env.LIFEOMIC_SERVICE_NAME': `'${serviceName}'`,
     }),
-    await loadPatch('lambda'),
   ];
+
+  if (enableLambdaPatch) {
+    plugins.push(await loadPatch('lambda'));
+  }
 
   if (enableDnsRetry) {
     plugins.push(await loadPatch('dns'));
@@ -65,8 +65,7 @@ export const createConfiguration = async (config: Config): Promise<ConfigureResu
     : undefined;
 
   const resolve: Configuration['resolve'] = {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    extensions: WEBPACK_DEFAULTS.resolve.extensions!.concat(['.js', '.ts', '.mjs', '.cjs']),
+    extensions: ['.js', '.ts', '.mjs', '.cjs'],
   };
   const resolveLoader: Configuration['resolveLoader'] = {};
 
@@ -99,9 +98,6 @@ export const createConfiguration = async (config: Config): Promise<ConfigureResu
     },
     devtool,
     plugins,
-    module: {
-      rules: createRules(config),
-    },
     mode: (process.env.WEBPACK_MODE || 'production') as Mode,
     optimization,
     resolve,
@@ -124,6 +120,7 @@ export const createConfiguration = async (config: Config): Promise<ConfigureResu
       loggingDebug: true,
     },
   };
+  setupLoaders(rawConfig, config);
 
   const webpackConfig: Configuration = await configTransformer(rawConfig);
 

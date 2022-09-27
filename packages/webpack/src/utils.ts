@@ -7,6 +7,8 @@ import { logging } from '@lifeomic/test-tool-utils';
 
 export const logger = logging.getLogger('lifeomic-webpack');
 
+export const DEFAULT_NODE_VERSION = '16';
+
 export const handleWebpackResults = (webpackResult?: Stats) => {
   if (!webpackResult) {
     throw new Error('compilation_error');

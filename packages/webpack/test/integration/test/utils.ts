@@ -4,8 +4,7 @@ import { testProject2DirName } from '../../testProject2';
 import { testProject3DirName } from '../../testProject3';
 import * as path from 'path';
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-export const tmpProjectDir = process.env.INTEGRATION_TEST_TMP_DIR!;
+export const tmpProjectDir = process.env.INTEGRATION_TEST_TMP_DIR as string;
 
 export const tmpTestProject1Dir = path.join(tmpProjectDir, testProject1DirName);
 export const tmpTestProject2Dir = path.join(tmpProjectDir, testProject2DirName);

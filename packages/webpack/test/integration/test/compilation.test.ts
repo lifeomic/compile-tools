@@ -64,6 +64,7 @@ test('works for yarn berry', async () => {
     'lifeomic-webpack',
     '-o', testBuildDir,
     '-z',
+    '--babel-loader',
     join(tmpTestProject3Dir, 'sharp.ts'),
   ], {
     cwd: tmpTestProject3Dir,
