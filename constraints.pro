@@ -9,6 +9,9 @@ gen_enforced_field(WorkspaceCwd, 'engines.node', '>=18') :-
 % Enforces the version for all projects as 0.0.0
 gen_enforced_field(WorkspaceCwd, 'version', '0.0.0').
 
+% Enforces the yarn package version
+gen_enforced_field(WorkspaceCwd, 'packageManager', 'yarn@3.2.3').
+
 % Enforces that all workspaces depend on other workspaces using `workspace:^`
 gen_enforced_dependency(WorkspaceCwd, DependencyIdent, 'workspace:^', DependencyType) :-
   workspace_has_dependency(WorkspaceCwd, DependencyIdent, DependencyRange, DependencyType),

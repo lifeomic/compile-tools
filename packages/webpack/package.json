@@ -1,7 +1,7 @@
 {
   "name": "@lifeomic/compile-tool-webpack",
   "version": "0.0.0",
-  "packageManager": "yarn@3.1.1",
+  "packageManager": "yarn@3.2.3",
   "main": "./src/index",
   "types": "./src/index.ts",
   "bin": {
@@ -91,6 +91,5 @@
     "webpack": "^5.72.0",
     "yargs": "^17.3.1",
     "zip-webpack-plugin": "^4.0.1"
-  },
-  "stableVersion": "0.0.0"
+  }
 }
