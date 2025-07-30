@@ -57,7 +57,7 @@
     "jest": "^28.1.0",
     "jest-mock-extended": "^2.0.6",
     "jszip": "^3.8.0",
-    "koa": "^2.16.1",
+    "koa": "^3.0.1",
     "lodash": "^4.17.21",
     "node-loader": "^2.0.0",
     "serverless-http": "^2.7.0",
